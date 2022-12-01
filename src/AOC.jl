@@ -1,5 +1,4 @@
 using Downloads
-using Printf
 
 function getinputforday(day)
     path = joinpath(Base.source_dir(), "..", ".sessionid")
@@ -11,7 +10,11 @@ function getinputforday(day)
     r = Downloads.request(
         "https://adventofcode.com/2022/day/$day/input",
         output=output,
-        headers=Dict("Cookie" => "session=$sessionid"))
+        headers=Dict(
+            "Cookie" => "session=$sessionid",
+            "User-Agent" => "https://github.com/FractalBoy/advent-of-code-2022 by reisner.marc@gmail.com"
+        )
+    )
 
     String(take!(output))
 end
