@@ -20,21 +20,20 @@ function getinputforday(day)
 end
 
 
-function solveday(day)
+function solveday(day, mod)
     input = getinputforday(day)
-    imp = include("Day$day.jl")
 
     data = ["", ""]
     times = [0.0, 0.0]
 
-    if isdefined(imp, :solvepart1)
-        (result, time) = @timed Base.invokelatest(imp.solvepart1, input)
+    if isdefined(mod, :solvepart1)
+        (result, time) = @timed mod.solvepart1(input)
         setindex!(data, string(result), 1)
         setindex!(times, time, 1)
     end
 
-    if isdefined(imp, :solvepart2)
-        (result, time) = @timed Base.invokelatest(imp.solvepart2, input)
+    if isdefined(mod, :solvepart2)
+        (result, time) = @timed mod.solvepart2(input)
         setindex!(data, string(result), 2)
         setindex!(times, time, 2)
     end

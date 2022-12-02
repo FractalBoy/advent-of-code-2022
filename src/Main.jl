@@ -1,3 +1,6 @@
 include("AOC.jl")
 
-solveday(ARGS[1])
+day = ARGS[1]
+mod = include("Day$day.jl")
+
+solveday(day, mod)
