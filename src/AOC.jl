@@ -45,10 +45,10 @@ function solveday(day, mod)
         maxlen = 7
     end
 
-    print(repeat(" ", maxlen - 7))
+    print(repeat(" ", maxlen - 6))
     println(" | Time")
     print("-----+--------")
-    print(repeat("-", maxlen - 7))
+    print(repeat("-", maxlen - 6))
     println("+-----------")
 
     for i in eachindex(data)
@@ -57,7 +57,7 @@ function solveday(day, mod)
         end
 
         print("$i    | " * data[i])
-        print(repeat(" ", maxlen - length(data[i])))
+        print(repeat(" ", maxlen - length(data[i]) + 1))
         print("| ")
         println(times[i])
     end
