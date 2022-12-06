@@ -1,3 +1,5 @@
+module AOC
+
 using Downloads
 
 function getinputforday(day)
@@ -61,4 +63,6 @@ function solveday(day, mod)
         print("| ")
         println(times[i])
     end
+end
+
 end
