@@ -45,24 +45,24 @@ function parseinstruction(instruction)::Instruction
         parse(Int64, m.captures[3]))
 end
 
-function doinstruction1(crates, instruction::Instruction)
+function doinstruction1!(crates, instruction::Instruction)
     for _ in 1:instruction.quantity
         popped = popfirst!(crates[instruction.origin])
         pushfirst!(crates[instruction.destination], popped)
     end
 end
 
-function doinstruction2(crates, instruction::Instruction)
+function doinstruction2!(crates, instruction::Instruction)
     removed = splice!(crates[instruction.origin], 1:instruction.quantity)
     prepend!(crates[instruction.destination], removed)
 end
 
-function solve(input, doinstruction)
+function solve(input, doinstruction!)
     crates, instructions = parsecrates(input)
     instructions = map(parseinstruction, instructions)
 
     for instruction in instructions
-        doinstruction(crates, instruction)
+        doinstruction!(crates, instruction)
     end
 
     return join(map(first, crates), "")
@@ -70,11 +70,11 @@ end
 
 
 function solvepart1(input::String)
-    return solve(input, doinstruction1)
+    return solve(input, doinstruction1!)
 end
 
 function solvepart2(input::String)
-    return solve(input, doinstruction2)
+    return solve(input, doinstruction2!)
 end
 
 end
