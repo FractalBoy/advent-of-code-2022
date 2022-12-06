@@ -75,5 +75,5 @@ end
     move 1 from 1 to 2
     """
     @test Day5.solvepart1(testinput) === "CMZ"
-    @test Day5.solvepart2(testinput) === nothing
+    @test Day5.solvepart2(testinput) === "MCD"
 end
