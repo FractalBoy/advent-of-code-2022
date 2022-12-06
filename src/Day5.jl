@@ -11,44 +11,30 @@ function parsecrates(input::String)
     lines = split(input, "\n")
     consumed = 0
 
+    regex = r"(^(?:\[[A-Z]\]| {3})| (?:\[[A-Z]\]| {3}))"
+
     for line in lines
         consumed += 1
 
-        if startswith(line, " 1")
+        matches = eachmatch(regex, line)
+
+        if isempty(matches)
             break
         end
 
-        crates = []
-        crate = ""
-        skip = 0
-
-        for char in line
-            if skip > 0
-                skip -= 1
-                continue
-            end
-
-            crate *= char
-
-            if length(crate) == 3
-                crate = replace(crate, r"[\[\]]" => "", r"\s+" => "")
-                push!(crates, crate)
-                crate = ""
-                skip = 1
-            end
-        end
-
+        crates = map(m -> replace(m.captures[1], r"[\[\]]" => "", r"\s+" => ""), matches)
         matrix = vcat(matrix, [crates])
     end
 
     width = maximum(map(length, matrix))
+    height = length(matrix)
 
     for row in matrix
         append!(row, repeat([""], width - length(row)))
     end
 
     matrix = reverse(rotl90(reduce(hcat, matrix)), dims=1)
-    return map(c -> filter(!isempty, c), eachcol(matrix)), filter(!isempty, lines[consumed+1:end])
+    return map(c -> filter(!isempty, c), eachcol(matrix)), filter(!isempty, lines[height+2:end])
 end
 
 function parseinstruction(instruction)::Instruction
