@@ -43,51 +43,36 @@ function adjust(newheadcoord::Tuple{Int64,Int64}, tailcoord::Tuple{Int64,Int64})
     return (tailcoord[1] + movex, tailcoord[2] + movey)
 end
 
-function solvepart1(input::String)
+function solve(input::String, knots::Int64)
     steps = parseinput(input)
 
-    head = (0, 0)
-    tail = (0, 0)
+    knots = repeat([(0, 0)], knots + 1)
 
     visited = []
 
-    push!(visited, tail)
+    push!(visited, knots[end])
 
     for step in steps
         for _ = 1:step.count
-            head = move(head, step.direction)
-            tail = adjust(head, tail)
-            push!(visited, tail)
+            knots[1] = move(knots[1], step.direction)
+
+            for knot in eachindex(@view knots[1:end-1])
+                knots[knot+1] = adjust(knots[knot], knots[knot+1])
+            end
+
+            push!(visited, knots[end])
         end
     end
 
     return length(unique(visited))
 end
 
+function solvepart1(input::String)
+    return solve(input, 1)
+end
+
 function solvepart2(input::String)
-    steps = parseinput(input)
-
-    head = (0, 0)
-    knots = repeat([(0, 0)], 9)
-
-    visited = []
-
-    push!(visited, knots[9])
-
-    for step in steps
-        for _ = 1:step.count
-            head = move(head, step.direction)
-            knots[1] = adjust(head, knots[1])
-
-            for knot = 2:9
-                knots[knot] = adjust(knots[knot-1], knots[knot])
-            end
-
-            push!(visited, knots[9])
-        end
-    end
-
-    return length(unique(visited))
+    return solve(input, 9)
 end
 
 end
