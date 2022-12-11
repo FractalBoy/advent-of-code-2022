@@ -1,6 +1,6 @@
 using Test
 
-tests = 1:8
+tests = 1:9
 
 if !isempty(ARGS)
     tests = ARGS
