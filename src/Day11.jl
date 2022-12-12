@@ -1,26 +1,13 @@
 module Day11
 
-struct Monkey
+mutable struct Monkey
     number::Int64
     items::Vector{Int64}
     operation::Function
-    test::Function
+    div::Int64
     truemonkey::Int64
     falsemonkey::Int64
-end
-
-DEBUG = false
-
-function debugprint(input)
-    if DEBUG
-        print(input)
-    end
-end
-
-function debugprintln(input)
-    if DEBUG
-        println(input)
-    end
+    inspections::Int64
 end
 
 function parsemonkey(input)::Monkey
@@ -36,79 +23,59 @@ function parsemonkey(input)::Monkey
     truemonkey = parse(Int64, m[6])
     falsemonkey = parse(Int64, m[7])
 
-    stroper = m[3] == "+" ? "increases by" : "is multiplied by"
-
     if operand == "old"
-        operation = old -> begin
-            ret = operator(old, old)
-            debugprintln("    Worry level $stroper itself to $ret.")
-            return ret
-        end
+        operation = old -> operator(old, old)
     else
         operand = parse(Int64, operand)
-        operation = old -> begin
-            ret = operator(old, operand)
-            debugprintln("    Worry level $stroper $operand to $ret.")
-            return ret
-        end
+        operation = old -> operator(old, operand)
     end
 
-    test = new -> begin
-        ret = new % divisibleby == 0
-        debugprint("    Current worry level is")
-        if !ret
-            debugprint(" not")
-        end
-
-        debugprintln(" divisible by $divisibleby.")
-        return ret
-    end
-
-    return Monkey(monkeynumber, items, operation, test, truemonkey, falsemonkey)
+    return Monkey(monkeynumber, items, operation, divisibleby, truemonkey, falsemonkey, 0)
 end
 
-function doround!(monkeys::Vector{Monkey}, inspections::Dict{Int64,Int64})
+function parsemonkeys(input)
+    return map(m -> parsemonkey(m), filter(!isempty, split(input, "\n\n")))
+end
+
+function doround!(monkeys::Vector{Monkey}, reduceworrylevel::Function)
     for monkey in monkeys
-        debugprintln("Monkey $(monkey.number):")
         while !isempty(monkey.items)
             item = popfirst!(monkey.items)
-            debugprintln("  Monkey inspects an item with a worry level of $item.")
 
-            if monkey.number ∉ keys(inspections)
-                inspections[monkey.number] = 0
-            end
-
-            inspections[monkey.number] += 1
+            monkey.inspections += 1
 
             worrylevel = monkey.operation(item)
-            debugprint("    Monkey gets bored with item. Worry level is divided by 3 to ")
-            worrylevel ÷= 3
-            debugprintln("$worrylevel.")
+            worrylevel = reduceworrylevel(worrylevel)
 
-            if monkey.test(worrylevel)
-                target = monkeys[monkey.truemonkey+1]
+            if worrylevel % monkey.div == 0
+                target = monkey.truemonkey
             else
-                target = monkeys[monkey.falsemonkey+1]
+                target = monkey.falsemonkey
             end
 
-            debugprintln("    Item with worry level $worrylevel is thrown to monkey $(target.number).")
-            push!(target.items, worrylevel)
+            push!(filter(m -> m.number == target, monkeys)[1].items, worrylevel)
         end
     end
+end
+
+function solve(monkeys::Vector{Monkey}, iterations::Int64, reduceworrylevel::Function)
+    for _ = 1:iterations
+        doround!(monkeys, reduceworrylevel)
+    end
+
+    return reduce(*, sort(map(m -> m.inspections, monkeys), rev=true)[1:2])
 end
 
 function solvepart1(input::String)
-    monkeys = map(m -> parsemonkey(m), filter(!isempty, split(input, "\n\n")))
-    inspections = Dict{Int64,Int64}()
-
-    for _ = 1:20
-        doround!(monkeys, inspections)
-    end
-
-    return reduce(*, sort(collect(values(inspections)), rev=true)[1:2])
+    monkeys = parsemonkeys(input)
+    return solve(monkeys, 20, worrylevel -> worrylevel ÷ 3)
 end
 
 function solvepart2(input::String)
+    monkeys = parsemonkeys(input)
+    mod = reduce(*, map(m -> m.div, monkeys))
+
+    return solve(monkeys, 10000, worrylevel -> worrylevel % mod)
 end
 
 end

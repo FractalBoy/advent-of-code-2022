@@ -29,6 +29,6 @@
         If true: throw to monkey 0
         If false: throw to monkey 1
     """
-    @test Day11.solvepart1(testinput) === 10605
-    @test Day11.solvepart2(testinput) === nothing
+    @test Day11.solvepart1(testinput) == 10605
+    @test Day11.solvepart2(testinput) == 2713310158
 end
